@@ -1,0 +1,13 @@
+[Unit]
+Description=Key Monitor
+
+[Service]
+ExecStart=/usr/local/bin/keymon
+Type=notify
+Restart=always
+StandardOutput=journal
+StandardError=journal
+Environment=DISPLAY
+
+[Install]
+WantedBy=multi-user.target
