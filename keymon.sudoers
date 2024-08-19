@@ -1,0 +1,2 @@
+ALL ALL=(root) NOPASSWD: /usr/bin/keymon*
+ALL ALL=(root) NOPASSWD: /usr/local/bin/keymon*

@@ -1,12 +1,16 @@
 PREFIX ::= /usr/local
 CC ::= gcc
-CFLAGS ::= -g -Wpedantic 
+CFLAGS ::= -g -Wpedantic
 
 .PHONY: compile
 compile:
 	mkdir -p ./out
 	$(CC) -std=gnu2x $(CFLAGS) -I./third_party/raylib/include -o ./out/launcher ./launcher.c -L./third_party/raylib/lib -lraylib -lm
 	$(CC) -std=gnu11 $(CFLAGS) -o ./out/keymon ./keymon.c -lsystemd
+
+.PHONY: run
+run:
+	LD_LIBRARY_PATH=$(PWD)/third_party/raylib/lib ./out/launcher
 
 .PHONY: install
 install:
@@ -15,9 +19,10 @@ install:
 	ldconfig
 	install -D ./out/launcher $(PREFIX)/bin/launcher
 	install -D ./out/keymon $(PREFIX)/bin/keymon
-	install -D ./keymon.service $(PREFIX)/lib/systemd/system/keymon.service
+	install -D -m0644 ./keymon.service $(PREFIX)/lib/systemd/system/keymon.service
 	systemctl disable keymon.service
-	install -D ./keymon.sh /etc/profile.d/keymon.sh
+	install -D -m0644 ./keymon.sh /etc/profile.d/keymon.sh
+	install -D -m0644 ./keymon.sudoers /etc/sudoers.d/keymon
 
 .PHONY: uninstall
 uninstall:
@@ -29,3 +34,4 @@ uninstall:
 	rm -f $(PREFIX)/lib/systemd/system/keymon.service
 # systemctl disable --now keymon.service
 	rm -f /etc/profile.d/keymon.sh
+	rm -f /etc/sudoers.d/keymon
