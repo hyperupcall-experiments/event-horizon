@@ -9,8 +9,6 @@ else
 	_dir=$PWD
 fi
 
-if ! pgrep keymon >/dev/null; then
-	pkexec bash -c "DISPLAY=$DISPLAY \"$_dir/out/keymon\""
-fi
+#sudo --background --preserve-env=DISPLAY /usr/local/bin/keymon >|"$_dir/output" 2>&1
 
 unset -v _dir
