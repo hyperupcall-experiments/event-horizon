@@ -21,7 +21,6 @@ install:
 	install -D ./out/keymon $(PREFIX)/bin/keymon
 	install -D -m0644 ./keymon.service $(PREFIX)/lib/systemd/system/keymon.service
 	systemctl disable keymon.service
-	install -D -m0644 ./keymon.sh /etc/profile.d/keymon.sh
 	install -D -m0644 ./keymon.sudoers /etc/sudoers.d/keymon
 
 .PHONY: uninstall
