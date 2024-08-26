@@ -14,9 +14,12 @@ int main() {
 
 	SetTraceLogLevel(LOG_ERROR);
 
-	const int windowWidth = 400;
-	const int windowHeight = 600;
+	int scale = 2;
+	const int windowWidth = 400 * scale;
+	const int windowHeight = 600 * scale;
 	InitWindow(windowWidth, windowHeight, "Launcher");
+
+	Font fontTtf = LoadFontEx("/usr/share/launcher/fonts/Rubik-Regular.ttf", 48 * scale, 0, 250);
 
 	struct Entry {
 		char *name;
@@ -26,7 +29,7 @@ int main() {
 	};
 	struct Entry *entries[3];
 	entries[0] = malloc(sizeof(struct Entry));
-	entries[0]->name = "Launch Knowledge Base";
+	entries[0]->name = "Knowledge Base";
 	entries[0]->run = "xdg-open obsidian://open?vault=Knowledge &";
 	// entries[0]->exec = "xdg-open";
 	// entries[0]->args = malloc(2 * sizeof(char *));
@@ -35,7 +38,7 @@ int main() {
 	// entries[0]->args[1] = NULL;
 
 	entries[1] = malloc(sizeof(struct Entry));
-	entries[1]->name = "Launch Hub";
+	entries[1]->name = "Hub";
 	entries[1]->run = "xdg-open http://localhost:49501/ &";
 	// entries[1]->exec = "xdg-open";
 	// entries[1]->args = malloc(2 * sizeof(char *));
@@ -44,7 +47,7 @@ int main() {
 	// entries[1]->args[1] = NULL;
 
 	entries[2] = malloc(sizeof(struct Entry));
-	entries[2]->name = "Launch Terminal";
+	entries[2]->name = "Terminal";
 	entries[2]->run = "x-terminal-emulator &";
 
 	int const entryHeight = 100;
@@ -93,9 +96,9 @@ int main() {
 
 		for (int i = 0; i < sizeof(entries) / sizeof(entries[0]); ++i) {
 			DrawRectangle(0, i * entryHeight, windowWidth, entryHeight, i % 2 == 0 ? colorLightGray : colorDarkGray);
-			DrawText(entries[i]->name, 10, i * entryHeight + 10, 20, colorBlack);
+			DrawTextEx(fontTtf, entries[i]->name, (Vector2){ 25, (i * entryHeight + 10) - 5 }, (float)fontTtf.baseSize, 2, colorBlack);
 			if (i == currentEntry) {
-				DrawRectangle(0, i * entryHeight, 2, entryHeight, colorBlack);
+				DrawTriangle((Vector2){ 0, (i * entryHeight) }, (Vector2){ 0, ((i + 1) * entryHeight)}, (Vector2){ 15, (i * entryHeight) + (entryHeight / 2) }, colorBlack);
 			}
 		}
 
