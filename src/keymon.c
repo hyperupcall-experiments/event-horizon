@@ -89,10 +89,12 @@ int main(int argc, char *argv[]) {
 			break;
 		}
 
+		// Filter out non-key input events.
 		if (input_data.type != EV_KEY) {
 			continue;
 		}
 
+		// When any key is released, "reset" these variables.
 		if (input_data.value == 0) {
 			memset(&input_data, 0, input_size);
 			memset(&prev_input_data, 0, input_size);
@@ -100,11 +102,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		// When debugging, it is useful to separate debug messages by whitespace.
-		if (input_data.code == KEY_ENTER) {
-			continue;
-		}
-
-		if (is_debug) {
+		if (is_debug && input_data.code != KEY_ENTER) {
 			printf("code=%hu value=%u time=%ld.%06lu\n", input_data.code, input_data.value, input_data.time.tv_sec,
 			       		input_data.time.tv_usec);
 		}
@@ -116,7 +114,6 @@ int main(int argc, char *argv[]) {
 		} else {
 			sequential_shifts = 0;
 		}
-
 
 		/**
 		 * There are two ways to launch the launcher:

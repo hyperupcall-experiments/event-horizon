@@ -55,6 +55,8 @@ int main() {
 
 	SetTargetFPS(60);
 	while (!WindowShouldClose()) {
+		Vector2 mousePosition = GetMousePosition();
+
 		BeginDrawing();
 		ClearBackground(RAYWHITE);
 
