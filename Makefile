@@ -5,8 +5,8 @@ CFLAGS ::= -g -Wpedantic
 .PHONY: compile
 compile:
 	mkdir -p ./out
-	$(CC) -std=gnu2x $(CFLAGS) -I./third_party/raylib/include -o ./out/launcher ./launcher.c -L./third_party/raylib/lib -lraylib -lm
-	$(CC) -std=gnu11 $(CFLAGS) -o ./out/keymon ./keymon.c -lsystemd
+	$(CC) -std=gnu2x $(CFLAGS) -I./third_party/raylib/include -o ./out/launcher ./src/launcher.c -L./third_party/raylib/lib -lraylib -lm
+	$(CC) -std=gnu11 $(CFLAGS) -o ./out/keymon ./src/keymon.c -lsystemd
 
 .PHONY: run
 run:
@@ -18,10 +18,10 @@ install:
 	ln -fs libraylib.so $(PREFIX)/lib/libraylib.so.500
 	ldconfig
 	install -D ./out/keymon $(PREFIX)/bin/keymon
-	install -D -m0644 ./keymon.service $(PREFIX)/lib/systemd/system/keymon.service
+	install -D -m0644 ./config/keymon.service $(PREFIX)/lib/systemd/system/keymon.service
 	systemctl daemon-reload
 	systemctl enable --now keymon.service
-	install -D -m0644 ./keymon.sudoers /etc/sudoers.d/keymon
+	install -D -m0644 ./config/keymon.sudoers /etc/sudoers.d/keymon
 
 	install -D -m0644 ./fonts/Rubik-Regular.ttf /usr/share/launcher/fonts/Rubik-Regular.ttf
 	install -D ./out/launcher $(PREFIX)/bin/launcher
