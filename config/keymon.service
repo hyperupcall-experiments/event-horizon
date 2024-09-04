@@ -2,7 +2,7 @@
 Description=Key Monitor
 
 [Service]
-ExecStart=/usr/local/bin/keymon
+ExecStart=/usr/local/bin/keymon /dev/input/by-id/usb-Microsoft_Surface_Type_Cover-event-kbd
 Type=notify
 Restart=always
 StandardOutput=journal

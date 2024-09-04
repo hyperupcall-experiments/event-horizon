@@ -30,25 +30,19 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 
-	char *usage_text = "Usage: keymon [--help]\n";
+	char *usage_text = "Usage: keymon <device_path> [--help]\n";
 	for (int i = 0; i < argc; i++) {
 		if (strcmp(argv[i], "--help") == 0) {
 			printf("%s", usage_text);
 			exit(0);
 		}
 	}
-	if (argc > 2) {
+	if (argc < 2 || argc > 2) {
 		fprintf(stderr, "%s", usage_text);
 		fprintf(stderr, "Error: Incorrect arguments\n");
 		exit(1);
 	}
-
-	char *input_dev;
-	if (argc == 1) {
-		input_dev = "/dev/input/by-id/usb-Microsoft_Surface_Type_Cover-event-kbd";
-	} else {
-		input_dev = argv[0];
-	}
+	char *input_dev = argv[1];
 
 	struct pollfd fds[1];
 	fds[0].events = POLLIN;
