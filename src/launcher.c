@@ -27,9 +27,9 @@ int main() {
 		// char *exec;
 		// char **args;
 	};
-	struct Entry *entries[3];
+	struct Entry *entries[4];
 	entries[0] = malloc(sizeof(struct Entry));
-	entries[0]->name = "Knowledge Base";
+	entries[0]->name = "Obsidian";
 	entries[0]->run = "xdg-open obsidian://open?vault=Knowledge &";
 	// entries[0]->exec = "xdg-open";
 	// entries[0]->args = malloc(2 * sizeof(char *));
@@ -38,17 +38,21 @@ int main() {
 	// entries[0]->args[1] = NULL;
 
 	entries[1] = malloc(sizeof(struct Entry));
-	entries[1]->name = "Hub";
-	entries[1]->run = "xdg-open http://localhost:49501/ &";
+	entries[1]->name = "My Knowledge";
+	entries[1]->run = "xdg-open http://localhost:52001/ &";
+
+	entries[2] = malloc(sizeof(struct Entry));
+	entries[2]->name = "Hub";
+	entries[2]->run = "xdg-open http://localhost:49501/ &";
 	// entries[1]->exec = "xdg-open";
 	// entries[1]->args = malloc(2 * sizeof(char *));
 	// char *str2 = "http://localhost:49501/";
 	// entries[1]->args[0] = str2;
 	// entries[1]->args[1] = NULL;
 
-	entries[2] = malloc(sizeof(struct Entry));
-	entries[2]->name = "Terminal";
-	entries[2]->run = "x-terminal-emulator &";
+	entries[3] = malloc(sizeof(struct Entry));
+	entries[3]->name = "Terminal";
+	entries[3]->run = "x-terminal-emulator &";
 
 	int const entryHeight = 100;
 	int currentEntry = 0;
