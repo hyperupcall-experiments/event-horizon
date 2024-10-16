@@ -26,8 +26,7 @@ bool is_keymon_process_running();
 int main(int argc, char *argv[]) {
 	printf("Starting keymon...\n");
 	if (is_keymon_process_running()) {
-		// TODO: Print to standard error for these types of messages.
-		printf("A keymon process already exists. Terminating...\n");
+		fprintf(stderr, "A keymon process already exists. Terminating...\n");
 		exit(0);
 	}
 
@@ -68,10 +67,10 @@ int main(int argc, char *argv[]) {
 		fds[i].fd = open(devices[i], O_RDONLY | O_NONBLOCK);
 		if (fds[i].fd < 0) {
 			if (devices_len == 1) {
-				printf("Error: Failed to open file \"%s\"\n", devices[i]);
+				fprintf(stderr, "Error: Failed to open file \"%s\"\n", devices[i]);
 				exit(1);
 			} else {
-				printf("Warning: Failed to open file \"%s\"\n", devices[i]);
+				fprintf(stderr, "Warning: Failed to open file \"%s\"\n", devices[i]);
 			}
 		}
 	}
@@ -92,7 +91,7 @@ int main(int argc, char *argv[]) {
 			perror("Poll error");
 			exit(1);
 		} else if (ret == 0) {
-			printf("Timeout error\n");
+			fprintf(stderr, "Timeout error\n");
 			continue;
 		}
 
@@ -103,12 +102,8 @@ int main(int argc, char *argv[]) {
 
 			ssize_t r = read(fds[i].fd, &input_data, input_size);
 			if (r < 0) {
-				printf("Read error %d\n", (int)r);
+				fprintf(stderr, "Read error %d\n", (int)r);
 				break;
-			}
-			if (is_debug && input_data.code != KEY_ENTER) {
-				printf("code=%hu value=%u time=%ld.%06lu\n", input_data.code, input_data.value, input_data.time.tv_sec,
-					input_data.time.tv_usec);
 			}
 
 			// Filter out non-key input events.
