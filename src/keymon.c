@@ -101,9 +101,14 @@ int main(int argc, char *argv[]) {
 			}
 
 			ssize_t r = read(fds[i].fd, &input_data, input_size);
-			if (r < 0) {
-				fprintf(stderr, "Read error %d\n", (int)r);
-				break;
+			if (r == -1) {
+				/**
+				 * If a device is no longer connected, ignore the error and continue.
+				 */
+				if (errno == ENODEV) {
+					continue;
+				}
+				perror("Failed to read");
 			}
 
 			// Filter out non-key input events.
