@@ -23,36 +23,22 @@ int main() {
 
 	struct Entry {
 		char *name;
-		char *run;
-		// char *exec;
-		// char **args;
+		char **argv;
 	};
-	struct Entry *entries[4];
-	entries[0] = malloc(sizeof(struct Entry));
-	entries[0]->name = "Obsidian";
-	entries[0]->run = "xdg-open obsidian://open?vault=Knowledge &";
-	// entries[0]->exec = "xdg-open";
-	// entries[0]->args = malloc(2 * sizeof(char *));
-	// char *str1 = "obsidian://open?vault=Knowledge";
-	// entries[0]->args[0] = str1;
-	// entries[0]->args[1] = NULL;
-
-	entries[1] = malloc(sizeof(struct Entry));
-	entries[1]->name = "My Knowledge";
-	entries[1]->run = "xdg-open http://localhost:52001/ &";
-
-	entries[2] = malloc(sizeof(struct Entry));
-	entries[2]->name = "Hub";
-	entries[2]->run = "xdg-open http://localhost:49501/ &";
-	// entries[1]->exec = "xdg-open";
-	// entries[1]->args = malloc(2 * sizeof(char *));
-	// char *str2 = "http://localhost:49501/";
-	// entries[1]->args[0] = str2;
-	// entries[1]->args[1] = NULL;
-
-	entries[3] = malloc(sizeof(struct Entry));
-	entries[3]->name = "Terminal";
-	entries[3]->run = "x-terminal-emulator &";
+	struct Entry entries[3] = {
+		{
+			.name = "Brain",
+			.argv = (char *[]){"xdg-open", "http://localhost:52001/", NULL}
+		},
+		{
+			.name = "Obsidian",
+			.argv = (char *[]){"xdg-open", "obsidian://open?vault=KnowledgeObsidian", NULL}
+		},
+		{
+			.name = "Terminal",
+			.argv = (char *[]){"x-terminal-emulator", NULL}
+		}
+	};
 
 	int const entryHeight = 100;
 	int currentEntry = 0;
@@ -76,33 +62,40 @@ int main() {
 		}
 
 		if (IsKeyPressed(KEY_ENTER)) {
-			struct Entry *entry = entries[currentEntry];
-			printf("Launching %s\n", entry->name);
-			printf("Running: %s\n", entry->run);
+			struct Entry entry = entries[currentEntry];
+			printf("Launching %s\n", entry.name);
+			printf("Running prog: %s\n", entry.argv[0]);
 			int pid = fork();
 			if (pid < 0) {
 				exit(EXIT_FAILURE);
 			} else if (pid > 0) {
-				printf("Launching child process: %d\n", pid);
 				int status;
 				waitpid(pid, &status, 0);
 				exit(status);
 			} else {
-
-				// execvp(entry->exec, entry->args);
-				// perror("execvp");
-				// exit(EXIT_FAILURE);
-				system(entry->run);
-				EndDrawing();
-				CloseWindow();
-				printf("Exiting launcher system\n");
-				exit(EXIT_SUCCESS);
+				int pid2 = fork();
+				if (pid2 < 0) {
+					exit(EXIT_FAILURE);
+				} else if (pid2 > 0) {
+					int ret = execvp(entry.argv[0], entry.argv);
+					if (ret == -1) {
+						perror("execvp");
+					}
+					int status2;
+					waitpid(pid, &status2, 0);
+					exit(status2);
+				} else {
+					EndDrawing();
+					CloseWindow();
+					printf("Exiting launcher system\n");
+					exit(EXIT_SUCCESS);
+				}
 			}
 		}
 
 		for (int i = 0; i < sizeof(entries) / sizeof(entries[0]); ++i) {
 			DrawRectangle(0, i * entryHeight, windowWidth, entryHeight, i % 2 == 0 ? colorLightGray : colorDarkGray);
-			DrawTextEx(fontTtf, entries[i]->name, (Vector2){ 25, (i * entryHeight + 10) - 5 }, (float)fontTtf.baseSize, 2, colorBlack);
+			DrawTextEx(fontTtf, entries[i].name, (Vector2){ 25, (i * entryHeight + 10) - 5 }, (float)fontTtf.baseSize, 2, colorBlack);
 			if (i == currentEntry) {
 				DrawTriangle((Vector2){ 0, (i * entryHeight) }, (Vector2){ 0, ((i + 1) * entryHeight)}, (Vector2){ 15, (i * entryHeight) + (entryHeight / 2) }, colorBlack);
 			}
