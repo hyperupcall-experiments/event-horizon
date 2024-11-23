@@ -22,6 +22,7 @@
 #include <unistd.h>
 
 bool is_keymon_process_running();
+char *get_launcher_exe();
 
 int main(int argc, char *argv[]) {
 	printf("Starting keymon...\n");
@@ -42,6 +43,8 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "Error: Incorrect arguments\n");
 		exit(1);
 	}
+
+	char *launcher_exe = get_launcher_exe();
 
 #define MAX_DEVICES_LEN 8
 	int devices_len = 0;
@@ -164,25 +167,6 @@ int main(int argc, char *argv[]) {
 						exit(1);
 					}
 
-					char exe_path[PATH_MAX + 1];
-					exe_path[PATH_MAX] = '\0';
-					ssize_t exe_path_size = readlink("/proc/self/exe", exe_path, PATH_MAX + 1);
-					if (exe_path_size == -1) {
-						perror("Failed to readlink \"/proc/self/exe\"");
-						exit(1);
-					}
-					if (exe_path_size != strlen(exe_path)) {
-						perror("Failed to set \"exe_path\"");
-						exit(1);
-					}
-					char *exe_dirname = dirname(exe_path);
-					char *launcher_exe;
-					if (asprintf(&launcher_exe, "%s/launcher", exe_dirname) == -1) {
-						perror("Failed to assign launcher_exe");
-						exit(1);
-					};
-					printf("launcher_exe: %s\n", launcher_exe);
-
 					// Run the launcher if "launcher" exists in the same directory as "keymon".
 					struct stat st;
 					if (stat(launcher_exe, &st) != -1) {
@@ -275,4 +259,27 @@ bool is_keymon_process_running() {
 	}
 
 	return false;
+}
+
+char *get_launcher_exe() {
+	char exe_path[PATH_MAX + 1];
+	exe_path[PATH_MAX] = '\0';
+	ssize_t exe_path_size = readlink("/proc/self/exe", exe_path, PATH_MAX);
+	if (exe_path_size == -1) {
+		perror("Failed to readlink \"/proc/self/exe\"");
+		exit(1);
+	}
+	if (exe_path_size != strlen(exe_path)) {
+		fprintf(stderr, "Failed to set \"exe_path\"(%ld, %ld)", exe_path_size, strlen(exe_path));
+		exit(1);
+	}
+	char *exe_dirname = dirname(exe_path);
+	char *launcher_exe;
+	if (asprintf(&launcher_exe, "%s/launcher", exe_dirname) == -1) {
+		perror("Failed to assign launcher_exe");
+		exit(1);
+	};
+	printf("launcher_exe: %s\n", launcher_exe);
+
+	return launcher_exe;
 }
