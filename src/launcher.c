@@ -105,6 +105,4 @@ int main() {
 	}
 
 	CloseWindow();
-
-	return EXIT_SUCCESS;
 }
