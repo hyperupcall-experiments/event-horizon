@@ -1,5 +1,5 @@
 [Unit]
-Description=Key Monitor
+Description=Keymon
 
 [Service]
 Type=notify

@@ -71,7 +71,6 @@ int main(int argc, char *argv[]) {
 		if (fds[i].fd < 0) {
 			if (devices_len == 1) {
 				fprintf(stderr, "Error: Failed to open file \"%s\"\n", devices[i]);
-				exit(1);
 			} else {
 				fprintf(stderr, "Warning: Failed to open file \"%s\"\n", devices[i]);
 			}
@@ -197,21 +196,21 @@ bool is_keymon_process_running() {
 			continue;
 		}
 
-		bool is_proc_dir = true;
+		bool is_process_dir = true;
 		for (int i = 0; i < strlen(entry->d_name); i++) {
 			if (!isdigit(entry->d_name[i])) {
-				is_proc_dir = false;
+				is_process_dir = false;
 				break;
 			}
 		}
-		if (!is_proc_dir) {
-			// Skip non-directory entries like `/proc/mounts`.
+		if (!is_process_dir) {
+			// Skip process-related directories like `/proc/fs`.
 			continue;
 		}
 
-		char *cmdline_file_path;
+		char *cmdline_file_path = NULL;
 		if (asprintf(&cmdline_file_path, "/proc/%s/cmdline", entry->d_name) == -1) {
-			perror("Failed to assign cmdline_file_path");
+			perror("Failed to assign to cmdline_file_path");
 			exit(1);
 		}
 
@@ -220,11 +219,9 @@ bool is_keymon_process_running() {
 			// Skip processes that we can't read the command line for.
 			continue;
 		}
+
+		// TODO
 		char exe_path[PATH_MAX + 1];
-		// if (strcpy(exe_path, cmdline_file) == NULL) {
-		// 	perror("Failed to read cmdline file");
-		// 	exit(1);
-		// }
 		int i = 0;
 		char c;
 		while ((c = fgetc(cmdline_file)) != EOF) {
@@ -256,14 +253,14 @@ bool is_keymon_process_running() {
 
 char *get_launcher_exe() {
 	char exe_path[PATH_MAX + 1];
-	exe_path[PATH_MAX] = '\0';
+	memset(exe_path, 0, PATH_MAX + 1);
 	ssize_t exe_path_size = readlink("/proc/self/exe", exe_path, PATH_MAX);
 	if (exe_path_size == -1) {
 		perror("Failed to readlink \"/proc/self/exe\"");
 		exit(1);
 	}
 	if (exe_path_size != strlen(exe_path)) {
-		fprintf(stderr, "Failed to set \"exe_path\"(%ld, %ld)", exe_path_size, strlen(exe_path));
+		fprintf(stderr, "Failed to set \"exe_path\"(%s)\n", exe_path);
 		exit(1);
 	}
 	char *exe_dirname = dirname(exe_path);

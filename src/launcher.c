@@ -25,10 +25,14 @@ int main() {
 		char *name;
 		char **argv;
 	};
-	struct Entry entries[3] = {
+	struct Entry entries[] = {
 		{
 			.name = "Brain",
 			.argv = (char *[]){"xdg-open", "http://localhost:52001/", NULL}
+		},
+		{
+			.name = "Edit Brain",
+			.argv = (char *[]){"zed", "/home/edwin/Dropbox-Maestral/Brain", NULL}
 		},
 		{
 			.name = "Obsidian",
