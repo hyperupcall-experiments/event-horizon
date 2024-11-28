@@ -2,11 +2,10 @@
 Description=Key Monitor
 
 [Service]
-ExecStart=/usr/local/bin/keymon /dev/input/by-id/usb-Microsoft_Surface_Type_Cover-event-kbd /dev/input/by-id/usb-Microsoft_Surface_Type_Cover-mouse /dev/input/by-id/usb-1bcf_08a0-mouse
 Type=notify
-Restart=always
+ExecStart=/usr/local/bin/keymon /dev/input/by-id/usb-Microsoft_Surface_Type_Cover-event-kbd /dev/input/by-id/usb-Microsoft_Surface_Type_Cover-mouse /dev/input/by-id/usb-1bcf_08a0-mouse
 StandardOutput=journal
 StandardError=journal
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

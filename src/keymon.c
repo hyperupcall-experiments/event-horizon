@@ -151,32 +151,25 @@ int main(int argc, char *argv[]) {
 			bool pressedAnyShiftThreeTimes = sequential_shifts >= 3;
 			if (pressingBothShiftsTwice || pressedAnyShiftThreeTimes) {
 				sequential_shifts = 0;
-				printf("Launching launcher...\n");
 				pid_t pid = fork();
 				if (pid == -1) {
 					perror("Failed to fork");
 					exit(1);
 				} else if (pid > 0) {
 					int status;
-					waitpid(pid, &status, 0);
-					printf("Child terminated with status: %i\n", status);
-				} else if (pid == 0) {
-					int did_daemonize = daemon(false, true);
-					if (did_daemonize != 0) {
+					if (waitpid(pid, &status, 0) == -1) {
+						perror("Failed waitpid");
+						exit(1);
+					}
+				} else {
+					if (daemon(false, true) == -1) {
 						perror("Failed to daemonize");
 						exit(1);
 					}
 
-					// Run the launcher if "launcher" exists in the same directory as "keymon".
-					struct stat st;
-					if (stat(launcher_exe, &st) != -1) {
-						char *exec;
-						if (asprintf(&exec, "systemd-run  --quiet --machine=edwin@ --user --collect --pipe \"%s\"", launcher_exe) == -1) {
-							perror("Failed to assign exec");
-							exit(1);
-						}
-						int status = system(exec);
-						exit(0);
+					if (execl(launcher_exe, launcher_exe, (char *)NULL) == -1) {
+						perror("Failed to execl");
+						exit(1);
 					}
 				}
 			}

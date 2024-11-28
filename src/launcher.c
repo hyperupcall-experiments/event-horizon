@@ -65,32 +65,11 @@ int main() {
 			struct Entry entry = entries[currentEntry];
 			printf("Launching %s\n", entry.name);
 			printf("Running prog: %s\n", entry.argv[0]);
-			int pid = fork();
-			if (pid < 0) {
-				exit(EXIT_FAILURE);
-			} else if (pid > 0) {
-				int status;
-				waitpid(pid, &status, 0);
-				exit(status);
-			} else {
-				int pid2 = fork();
-				if (pid2 < 0) {
-					exit(EXIT_FAILURE);
-				} else if (pid2 > 0) {
-					int ret = execvp(entry.argv[0], entry.argv);
-					if (ret == -1) {
-						perror("execvp");
-					}
-					int status2;
-					waitpid(pid, &status2, 0);
-					exit(status2);
-				} else {
-					EndDrawing();
-					CloseWindow();
-					printf("Exiting launcher system\n");
-					exit(EXIT_SUCCESS);
-				}
+			if (execvp(entry.argv[0], entry.argv) == -1) {
+				perror("Failed to execvp");
+				exit(1);
 			}
+			exit(0);
 		}
 
 		for (int i = 0; i < sizeof(entries) / sizeof(entries[0]); ++i) {
