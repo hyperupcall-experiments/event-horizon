@@ -1,4 +1,3 @@
-out/
-third_party/
-output
 .vscode/
+out/
+build/

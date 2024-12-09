@@ -5,12 +5,8 @@ CFLAGS ::= -g -Wpedantic
 .PHONY: compile
 compile:
 	mkdir -p ./out
-	$(CC) -std=gnu2x $(CFLAGS) -I./third_party/raylib/include -o ./out/launcher ./src/launcher.c -L./third_party/raylib/lib -lraylib -lm
+	$(CC) -std=gnu2x $(CFLAGS) $(shell pkg-config --cflags ./build/Debug/generators/raylib.pc) -o ./out/launcher ./src/launcher.c $(shell pkg-config --libs --static ./build/Debug/generators/raylib.pc)
 	$(CC) -std=gnu11 $(CFLAGS) -o ./out/keymon ./src/keymon.c -lsystemd
-
-.PHONY: run
-run:
-	LD_LIBRARY_PATH=$(PWD)/third_party/raylib/lib ./out/launcher
 
 .PHONY: install
 install:

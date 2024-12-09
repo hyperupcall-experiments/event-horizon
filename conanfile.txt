@@ -1,0 +1,10 @@
+[requires]
+raylib/5.5
+libsystemd/255.10
+
+[generators]
+PkgConfigDeps
+MakeDeps
+
+[layout]
+cmake_layout
