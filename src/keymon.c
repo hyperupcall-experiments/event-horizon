@@ -25,6 +25,16 @@ bool is_keymon_process_running();
 char *get_launcher_exe();
 
 int main(int argc, char *argv[]) {
+	/**
+	 * Hack to ensure that keymon is started no matter what. Prior to
+	 * this fix, if the service was started before $DISPLAY and $XAUTHORITY
+	 * were available, it would segfault upon displaying a GUI. Now,
+	 * it will continuiously restart until it can access the X11 environment.
+	 */
+	if (getenv("DISPLAY") == 0) {
+		exit(1);
+	}
+
 	printf("Starting keymon...\n");
 	if (is_keymon_process_running()) {
 		fprintf(stderr, "A keymon process already exists. Terminating...\n");

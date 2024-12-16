@@ -1,11 +1,13 @@
 [Unit]
 Description=Keymon
+# After=graphical-session.target
+# Requires=graphical-session.target
 
 [Service]
 Type=notify
 ExecStart=/usr/local/bin/keymon /dev/input/by-id/usb-Microsoft_Surface_Type_Cover-event-kbd /dev/input/by-id/usb-Microsoft_Surface_Type_Cover-mouse /dev/input/by-id/usb-1bcf_08a0-mouse
-StandardOutput=journal
-StandardError=journal
+Restart=always
+RestartSec=5s
 
 [Install]
 WantedBy=default.target
