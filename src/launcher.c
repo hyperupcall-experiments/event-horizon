@@ -12,14 +12,14 @@ int main() {
 	const Color colorDarkGray = (Color){173, 181, 189, 255};
 	const Color colorWhite = WHITE;
 
-	SetTraceLogLevel(LOG_ERROR);
+	SetTraceLogLevel(LOG_WARNING);
 
 	int scale = 2;
 	const int windowWidth = 400 * scale;
 	const int windowHeight = 600 * scale;
-	InitWindow(windowWidth, windowHeight, "Launcher");
+	InitWindow(windowWidth, windowHeight, "Event Horizon");
 
-	Font fontTtf = LoadFontEx("/usr/share/launcher/fonts/Rubik-Regular.ttf", 48 * scale, 0, 250);
+	Font fontTtf = LoadFontEx("/usr/local/share/launcher/fonts/Rubik-Regular.ttf", 48 * scale, 0, 250);
 
 	struct Entry {
 		char *name;
@@ -33,6 +33,10 @@ int main() {
 		{
 			.name = "Edit Brain",
 			.argv = (char *[]){"zed", "/home/edwin/Dropbox-Maestral/Brain", NULL}
+		},
+		{
+			.name = "Global Dev Server",
+			.argv = (char *[]){"xdg-open", "http://localhost:40008/", NULL}
 		},
 		{
 			.name = "Obsidian",
@@ -80,12 +84,13 @@ int main() {
 			DrawRectangle(0, i * entryHeight, windowWidth, entryHeight, i % 2 == 0 ? colorLightGray : colorDarkGray);
 			DrawTextEx(fontTtf, entries[i].name, (Vector2){ 25, (i * entryHeight + 10) - 5 }, (float)fontTtf.baseSize, 2, colorBlack);
 			if (i == currentEntry) {
-				DrawTriangle((Vector2){ 0, (i * entryHeight) }, (Vector2){ 0, ((i + 1) * entryHeight)}, (Vector2){ 15, (i * entryHeight) + (entryHeight / 2) }, colorBlack);
+				DrawTriangle((Vector2){ 0, (i * entryHeight) }, (Vector2){ 0, ((i + 1) * entryHeight)}, (Vector2){ 15, (i * entryHeight) + (entryHeight / 2.0) }, colorBlack);
 			}
 		}
 
 		EndDrawing();
 	}
 
+	UnloadFont(fontTtf);
 	CloseWindow();
 }

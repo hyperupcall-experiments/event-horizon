@@ -239,6 +239,7 @@ bool is_keymon_process_running() {
 			++i;
 		}
 		fclose(cmdline_file);
+		free(cmdline_file_path);
 
 		char exe_name1[] = "/usr/local/bin/keymon";
 		char exe_name2[] = "/usr/bin/keymon";
@@ -253,11 +254,19 @@ bool is_keymon_process_running() {
 			}
 			pid_t actual_pid = getpid();
 			if (d_pid != actual_pid) {
+				if (closedir(proc_dir) == -1) {
+					perror("Failed to close /proc");
+					exit(1);
+				}
 				return true;
 			}
 		}
 	}
 
+	if (closedir(proc_dir) == -1) {
+		perror("Failed to close /proc");
+		exit(1);
+	}
 	return false;
 }
 

@@ -10,28 +10,24 @@ compile:
 
 .PHONY: install
 install:
-	install -D ./third_party/raylib/lib/libraylib.so $(PREFIX)/lib/libraylib.so
-	ln -fs libraylib.so $(PREFIX)/lib/libraylib.so.500
-	ldconfig
-	install -D ./out/keymon $(PREFIX)/bin/keymon
-	install -D -m0644 ./config/keymon.service $(PREFIX)/lib/systemd/user/keymon.service
-	systemctl --user --machine=$$SUDO_USER@ daemon-reload
-	systemctl --user --machine=$$SUDO_USER@ enable --now keymon.service
-	install -D -m0644 ./config/keymon.sudoers /etc/sudoers.d/keymon
+	sudo install -D ./out/keymon $(PREFIX)/bin/keymon
+	install -D -m0644 ./config/keymon.service $(XDG_DATA_HOME)/systemd/user/keymon.service
+	systemctl --user daemon-reload
+	systemctl --user enable --now keymon.service
+	systemctl --user restart keymon.service
 
-	install -D -m0644 ./fonts/Rubik-Regular.ttf /usr/share/launcher/fonts/Rubik-Regular.ttf
-	install -D ./out/launcher $(PREFIX)/bin/launcher
+	sudo install -D -m0644 ./config/keymon.sudoers /etc/sudoers.d/keymon
+
+	sudo install -D -m0644 ./fonts/Rubik-Regular.ttf $(PREFIX)/share/launcher/fonts/Rubik-Regular.ttf
+	sudo install -D ./out/launcher $(PREFIX)/bin/launcher
 
 .PHONY: uninstall
 uninstall:
-	rm -f $(PREFIX)/lib/libraylib.so
-	rm -f $(PREFIX)/lib/libraylib.so.500
-	ldconfig
-	rm -f $(PREFIX)/bin/keymon
-	rm -f $(PREFIX)/lib/systemd/user/keymon.service
-	systemctl --user --machine=$$SUDO_USER disable --now keymon.service
-	systemctl --user --machine=$$SUDO_USER daemon-reload
-	rm -f /etc/sudoers.d/keymon
+	sudo rm -f $(PREFIX)/bin/keymon
+	rm -f $(XDG_DATA_HOME)/systemd/user/keymon.service
+	systemctl --user disable --now keymon.service
+	systemctl --user daemon-reload
+	sudo rm -f /etc/sudoers.d/keymon
 
-	rm -f $(PREFIX)/bin/launcher
-	rm -rf /usr/share/launcher/fonts/
+	sudo rm -f $(PREFIX)/bin/launcher
+	sudo rm -rf $(PREFIX)/share/launcher/fonts/

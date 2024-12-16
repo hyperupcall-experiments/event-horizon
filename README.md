@@ -1,3 +1,3 @@
-# launcher
+# Event Horizon
 
-![Launcher](./assets/launcher.png)
+![Screenshot of application](./assets/launcher.png)
