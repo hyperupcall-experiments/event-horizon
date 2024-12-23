@@ -3,8 +3,16 @@ project(event-horizon)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(raylib REQUIRED)
+find_package(libsystemd REQUIRED)
 
-add_executable(${PROJECT_NAME} ./src/launcher.c)
+add_executable(keymon ./src/keymon.c)
+target_include_directories(keymon PRIVATE ${CMAKE_INCLUDE_PATH})
+target_link_libraries(keymon libsystemd::libsystemd)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_INCLUDE_PATH})
-target_link_libraries(${PROJECT_NAME} PRIVATE raylib)
+add_executable(launcher ./src/launcher.c)
+target_include_directories(launcher PRIVATE ${CMAKE_INCLUDE_PATH})
+target_link_libraries(launcher raylib)
+
+# add_executable(wayland-test ./src/test.c)
+# target_include_directories(wayland-test PRIVATE ${CMAKE_INCLUDE_PATH})
+# target_link_libraries(wayland-test raylib libsystemd::libsystemd)
