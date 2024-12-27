@@ -1,6 +1,4 @@
 PREFIX ::= /usr/local
-CC ::= gcc
-CFLAGS ::= -g -Wpedantic -fsanitize=address,undefined
 XDG_DATA_HOME ::= ~/.local/share
 
 .PHONY: prebuild

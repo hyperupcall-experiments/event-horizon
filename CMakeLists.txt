@@ -4,6 +4,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 find_package(raylib REQUIRED)
 find_package(libsystemd REQUIRED)
+add_compile_options(-g -Wpedantic -fsanitize=address,undefined)
+add_link_options(-fsanitize=address,undefined)
 
 add_executable(keymon ./src/keymon.c)
 target_include_directories(keymon PRIVATE ${CMAKE_INCLUDE_PATH})
