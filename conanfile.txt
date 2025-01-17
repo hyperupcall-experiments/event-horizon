@@ -1,6 +1,7 @@
 [requires]
 raylib/5.5
 libsystemd/255.10
+wayland/1.23.0
 
 [generators]
 CMakeToolchain

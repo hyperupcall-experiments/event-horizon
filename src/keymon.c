@@ -154,11 +154,14 @@ int main(int argc, char *argv[]) {
 			* 1. Press both left shift and right shift at the same time
 			* 2. Press either left shift or right shift three times
 			*/
+			bool pressingTabAndTilde = (input_data.value == 1 && (input_data.code == KEY_GRAVE || input_data.code == KEY_BACKSPACE)) &&
+				(prev_input_data.value == 1 && (prev_input_data.code == KEY_GRAVE ||
+				prev_input_data.code == KEY_BACKSPACE));
 			bool pressingBothShiftsTwice = (input_data.value == 1 && (input_data.code == KEY_LEFTSHIFT || input_data.code == KEY_RIGHTSHIFT)) &&
 				(prev_input_data.value == 1 && (prev_input_data.code == KEY_LEFTSHIFT ||
 				prev_input_data.code == KEY_RIGHTSHIFT));
 			bool pressedAnyShiftThreeTimes = sequential_shifts >= 3;
-			if (pressingBothShiftsTwice || pressedAnyShiftThreeTimes) {
+			if (pressingTabAndTilde || pressingBothShiftsTwice || pressedAnyShiftThreeTimes) {
 				sequential_shifts = 0;
 				pid_t pid = fork();
 				if (pid == -1) {

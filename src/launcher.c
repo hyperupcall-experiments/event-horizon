@@ -32,7 +32,7 @@ int main() {
 		},
 		{
 			.name = "Edit Brain",
-			.argv = (char *[]){"zed", "/home/edwin/Dropbox-Maestral/Brain", NULL}
+			.argv = (char *[]){"zed", "/home/edwin/Documents/Brain", NULL}
 		},
 		{
 			.name = "Global Dev Server",
@@ -40,7 +40,7 @@ int main() {
 		},
 		{
 			.name = "Obsidian",
-			.argv = (char *[]){"xdg-open", "obsidian://open?vault=KnowledgeObsidian", NULL}
+			.argv = (char *[]){"xdg-open", "obsidian://open?vault=Brain", NULL}
 		},
 		{
 			.name = "Terminal",

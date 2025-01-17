@@ -3,6 +3,7 @@ XDG_DATA_HOME ::= ~/.local/share
 
 .PHONY: prebuild
 prebuild:
+	#cmake -S . -B ./build --preset conan-debug
 	cmake -S . -B ./build -G Ninja -DCMAKE_TOOLCHAIN_FILE=./build/Debug/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Debug
 
 .PHONY: build
@@ -18,8 +19,8 @@ install:
 	sudo install -D -m0644 ./fonts/Rubik-Regular.ttf $(PREFIX)/share/launcher/fonts/Rubik-Regular.ttf
 	sudo install -D ./build/launcher $(PREFIX)/bin/launcher
 
-	systemctl --user daemon-reload
-	systemctl --user enable --now keymon.service
+	systemctl --user daemon-reload --wait
+	systemctl --user enable --wait keymon.service
 	systemctl --user restart keymon.service
 
 .PHONY: uninstall

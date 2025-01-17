@@ -5,7 +5,12 @@ Description=Keymon
 
 [Service]
 Type=notify
-ExecStart=/usr/local/bin/keymon /dev/input/by-id/usb-Microsoft_Surface_Type_Cover-event-kbd /dev/input/by-id/usb-Microsoft_Surface_Type_Cover-mouse /dev/input/by-id/usb-1bcf_08a0-mouse
+ExecStart=/usr/local/bin/keymon \
+	/dev/input/by-id/usb-Microsoft_Surface_Type_Cover-event-kbd \
+	/dev/input/by-id/usb-SINO_WEALTH_Mechanical_Keyboard-event-kbd \
+	/dev/input/by-id/usb-Microsoft_Surface_Type_Cover-mouse \
+	/dev/input/by-id/usb-1bcf_08a0-mouse \
+	/dev/input/by-id/usb-04d9_USB_Gaming_Mouse-mouse
 Restart=always
 RestartSec=5s
 
