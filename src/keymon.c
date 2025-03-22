@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 	for (int i = 1, j = 0; i < argc; ++i) {
 		if (strlen(argv[i]) > 0 && argv[i][0] != '-') {
 			if (j >= MAX_DEVICES_LEN) {
-				fprintf(stderr, "Error: Too many arguments");
+				fprintf(stderr, "Error: Too many arguments\n");
 				exit(1);
 			}
 
@@ -114,13 +114,39 @@ int main(int argc, char *argv[]) {
 
 			ssize_t r = read(fds[i].fd, &input_data, input_size);
 			if (r == -1) {
-				/**
-				 * If a device is no longer connected, ignore the error and continue.
-				 */
+				// If a device is no longer connected, ignore the error and continue.
 				if (errno == ENODEV) {
 					continue;
 				}
 				perror("Failed to read");
+			}
+
+			// When moving the mouse, "reset" the variables.
+			if (input_data.type == EV_REL) {
+				memset(&input_data, 0, input_size);
+				memset(&prev_input_data, 0, input_size);
+				sequential_shifts = 0;
+				if (is_debug) {
+					printf("Resetting variables...\n");
+				}
+				continue;
+			}
+
+			// When clicking the mouse, "reset" the variables.
+			if (input_data.code == BTN_LEFT || input_data.code == BTN_MIDDLE || input_data.code == BTN_RIGHT) {
+				memset(&input_data, 0, input_size);
+				memset(&prev_input_data, 0, input_size);
+				sequential_shifts = 0;
+				if (is_debug) {
+					printf("Resetting variables...\n");
+				}
+				continue;
+			}
+
+			// Check for "KEY_ENTER" so debug messages can be separated by whitespace in the console.
+			if (is_debug && input_data.code != KEY_ENTER) {
+				printf("code=%hu value=%u time=%ld.%06lu\n", input_data.code, input_data.value, input_data.time.tv_sec,
+							input_data.time.tv_usec);
 			}
 
 			// Filter out non-key input events.
@@ -133,12 +159,6 @@ int main(int argc, char *argv[]) {
 				memset(&input_data, 0, input_size);
 				memset(&prev_input_data, 0, input_size);
 				continue;
-			}
-
-			// When debugging, it is useful to separate debug messages by whitespace.
-			if (is_debug && input_data.code != KEY_ENTER) {
-				printf("code=%hu value=%u time=%ld.%06lu\n", input_data.code, input_data.value, input_data.time.tv_sec,
-							input_data.time.tv_usec);
 			}
 
 			if ((input_data.code == KEY_LEFTSHIFT || input_data.code == KEY_RIGHTSHIFT)) {
