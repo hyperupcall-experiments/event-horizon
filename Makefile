@@ -16,7 +16,7 @@ install:
 	install -D -m0644 ./config/keymon.service $(XDG_DATA_HOME)/systemd/user/keymon.service
 	sudo install -D -m0644 ./config/keymon.sudoers /etc/sudoers.d/keymon
 
-	sudo install -D -m0644 ./fonts/Rubik-Regular.ttf $(PREFIX)/share/launcher/fonts/Rubik-Regular.ttf
+	sudo install -D -m0644 ./fonts/Rubik-Regular.ttf $(PREFIX)/share/event-horizon/fonts/Rubik-Regular.ttf
 	sudo install -D ./build/launcher $(PREFIX)/bin/launcher
 
 	systemctl --user daemon-reload --wait
@@ -32,6 +32,6 @@ uninstall:
 	sudo rm -f /etc/sudoers.d/keymon
 
 	sudo rm -f $(PREFIX)/bin/launcher
-	sudo rm -rf $(PREFIX)/share/launcher/fonts/
+	sudo rm -rf $(PREFIX)/share/event-horizon/fonts/
 
 	systemctl --user daemon-reload

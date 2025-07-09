@@ -19,7 +19,7 @@ int main() {
 	const int windowHeight = 600 * scale;
 	InitWindow(windowWidth, windowHeight, "Event Horizon");
 
-	Font fontTtf = LoadFontEx("/usr/local/share/launcher/fonts/Rubik-Regular.ttf", 48 * scale, 0, 250);
+	Font fontTtf = LoadFontEx("/usr/local/share/event-horizon/fonts/Rubik-Regular.ttf", 48 * scale, 0, 250);
 
 	struct Entry {
 		char *name;
