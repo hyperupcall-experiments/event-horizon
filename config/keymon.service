@@ -6,6 +6,7 @@ Description=Keymon
 [Service]
 Type=notify
 ExecStart=/usr/local/bin/keymon \
+	/dev/input/by-id/clevo-keyboard \
 	/dev/input/by-id/usb-Microsoft_Surface_Type_Cover-event-kbd \
 	/dev/input/by-id/usb-SINO_WEALTH_Mechanical_Keyboard-event-kbd \
 	/dev/input/by-id/usb-Microsoft_Surface_Type_Cover-mouse \

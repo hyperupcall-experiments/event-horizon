@@ -5,11 +5,11 @@
 ## Usage
 
 ```bash
-git clone git@github.com:fox-incubating/event-horizon
+git clone git@github.com:hyperupcall-experiments/event-horizon
 cd ./event-horizon
-conan install --build=missing .
-make prebuild
-make build
+conan install --build=missing --profile=debug .
+cmake --preset conan-debug
+cmake --build ./build/Debug
 make install
 launcher
 ```

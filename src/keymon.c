@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
+#include <libgen.h>
 #include <limits.h>
 #include <linux/input-event-codes.h>
 #include <linux/input.h>
@@ -12,11 +13,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/stat.h>
-#include <libgen.h>
 #include <systemd/sd-daemon.h>
 #include <time.h>
 #include <unistd.h>
@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
 	/**
 	 * Hack to ensure that keymon is started no matter what. Prior to
 	 * this fix, if the service was started before $DISPLAY and $XAUTHORITY
-	 * were available, it would segfault upon displaying a GUI. Now,
+	 * were available, it would segfault when attempting to display a GUI. Now,
 	 * it will continuiously restart until it can access the X11 environment.
 	 */
 	if (getenv("DISPLAY") == 0) {
@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 
 #define MAX_DEVICES_LEN 8
 	int devices_len = 0;
-	char* devices[MAX_DEVICES_LEN];
+	char *devices[MAX_DEVICES_LEN];
 	for (int i = 1, j = 0; i < argc; ++i) {
 		if (strlen(argv[i]) > 0 && argv[i][0] != '-') {
 			if (j >= MAX_DEVICES_LEN) {
@@ -121,6 +121,10 @@ int main(int argc, char *argv[]) {
 				perror("Failed to read");
 			}
 
+			if (input_data.code == EV_SYN || input_data.code == EV_MSC) {
+				continue;
+			}
+
 			// When moving the mouse, "reset" the variables.
 			if (input_data.type == EV_REL) {
 				memset(&input_data, 0, input_size);
@@ -143,10 +147,11 @@ int main(int argc, char *argv[]) {
 				continue;
 			}
 
-			// Check for "KEY_ENTER" so debug messages can be separated by whitespace in the console.
+			// Check for "KEY_ENTER" so debug messages can be separated by whitespace
+			// in the console.
 			if (is_debug && input_data.code != KEY_ENTER) {
 				printf("code=%hu value=%u time=%ld.%06lu\n", input_data.code, input_data.value, input_data.time.tv_sec,
-							input_data.time.tv_usec);
+				       input_data.time.tv_usec);
 			}
 
 			// Filter out non-key input events.
@@ -169,19 +174,12 @@ int main(int argc, char *argv[]) {
 				sequential_shifts = 0;
 			}
 
-			/**
-			* There are two ways to launch the launcher:
-			* 1. Press both left shift and right shift at the same time
-			* 2. Press either left shift or right shift three times
-			*/
-			bool pressingTabAndTilde = (input_data.value == 1 && (input_data.code == KEY_GRAVE || input_data.code == KEY_BACKSPACE)) &&
-				(prev_input_data.value == 1 && (prev_input_data.code == KEY_GRAVE ||
-				prev_input_data.code == KEY_BACKSPACE));
-			bool pressingBothShiftsTwice = (input_data.value == 1 && (input_data.code == KEY_LEFTSHIFT || input_data.code == KEY_RIGHTSHIFT)) &&
-				(prev_input_data.value == 1 && (prev_input_data.code == KEY_LEFTSHIFT ||
-				prev_input_data.code == KEY_RIGHTSHIFT));
-			bool pressedAnyShiftThreeTimes = sequential_shifts >= 3;
-			if (pressingTabAndTilde || pressingBothShiftsTwice || pressedAnyShiftThreeTimes) {
+			bool pressingMetaCombo = prev_input_data.value == 1 &&
+			                         (prev_input_data.code == KEY_LEFTMETA || prev_input_data.code == KEY_RIGHTMETA) &&
+			                         input_data.value == 1 &&
+			                         (input_data.code == KEY_BACKSPACE || input_data.code == KEY_ENTER ||
+			                          input_data.code == KEY_SPACE || input_data.code == KEY_RIGHTALT);
+			if (pressingMetaCombo) {
 				sequential_shifts = 0;
 				pid_t pid = fork();
 				if (pid == -1) {
