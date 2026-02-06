@@ -1,6 +1,6 @@
 # Event Horizon
 
-![Screenshot of application](./assets/launcher.png)
+![Screenshot of application](./assets/preview.png)
 
 ## Usage
 
