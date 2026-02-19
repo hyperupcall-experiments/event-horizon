@@ -6,7 +6,7 @@
 
 #include "raylib.h"
 
-int main() {
+int main(void) {
 	const Color colorBlack = (Color){52, 58, 64, 255};
 	const Color colorLightGray = (Color){233, 236, 239, 255};
 	const Color colorDarkGray = (Color){173, 181, 189, 255};

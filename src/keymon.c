@@ -21,8 +21,8 @@
 #include <time.h>
 #include <unistd.h>
 
-bool is_keymon_process_running();
-char *get_launcher_exe();
+bool is_keymon_process_running(void);
+char *get_launcher_exe(void);
 
 int main(int argc, char *argv[]) {
 	/**
@@ -214,7 +214,7 @@ int main(int argc, char *argv[]) {
 	}
 }
 
-bool is_keymon_process_running() {
+bool is_keymon_process_running(void) {
 	DIR *proc_dir = opendir("/proc");
 	if (proc_dir == NULL) {
 		perror("Failed to open /proc");
@@ -291,7 +291,7 @@ bool is_keymon_process_running() {
 	return false;
 }
 
-char *get_launcher_exe() {
+char *get_launcher_exe(void) {
 	char exe_path[PATH_MAX + 1];
 	memset(exe_path, 0, PATH_MAX + 1);
 	ssize_t exe_path_size = readlink("/proc/self/exe", exe_path, PATH_MAX);
