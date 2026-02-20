@@ -112,100 +112,108 @@ int main(int argc, char *argv[]) {
 				continue;
 			}
 
-			ssize_t r = read(fds[i].fd, &input_data, input_size);
-			if (r == -1) {
-				// If a device is no longer connected, ignore the error and continue.
-				if (errno == ENODEV) {
+			while (true) {
+				ssize_t r = read(fds[i].fd, &input_data, input_size);
+				if (r == -1) {
+					if (errno == EAGAIN || errno == EWOULDBLOCK) {
+						break;
+					}
+					if (errno == ENODEV) {
+						break;
+					}
+					perror("Failed to read");
+					break;
+				}
+				if (r == 0) {
+					break;
+				}
+
+				if (input_data.code == EV_SYN || input_data.code == EV_MSC) {
 					continue;
 				}
-				perror("Failed to read");
-			}
 
-			if (input_data.code == EV_SYN || input_data.code == EV_MSC) {
-				continue;
-			}
-
-			// When moving the mouse, "reset" the variables.
-			if (input_data.type == EV_REL) {
-				memset(&input_data, 0, input_size);
-				memset(&prev_input_data, 0, input_size);
-				sequential_shifts = 0;
-				if (is_debug) {
-					printf("Resetting variables...\n");
+				// When moving the mouse, "reset" the variables.
+				if (input_data.type == EV_REL) {
+					memset(&input_data, 0, input_size);
+					memset(&prev_input_data, 0, input_size);
+					sequential_shifts = 0;
+					if (is_debug) {
+						printf("Resetting variables...\n");
+					}
+					continue;
 				}
-				continue;
-			}
 
-			// When clicking the mouse, "reset" the variables.
-			if (input_data.code == BTN_LEFT || input_data.code == BTN_MIDDLE || input_data.code == BTN_RIGHT) {
-				memset(&input_data, 0, input_size);
-				memset(&prev_input_data, 0, input_size);
-				sequential_shifts = 0;
-				if (is_debug) {
-					printf("Resetting variables...\n");
+				// When clicking the mouse, "reset" the variables.
+				if (input_data.code == BTN_LEFT || input_data.code == BTN_MIDDLE || input_data.code == BTN_RIGHT) {
+					memset(&input_data, 0, input_size);
+					memset(&prev_input_data, 0, input_size);
+					sequential_shifts = 0;
+					if (is_debug) {
+						printf("Resetting variables...\n");
+					}
+					continue;
 				}
-				continue;
-			}
 
-			// Check for "KEY_ENTER" so debug messages can be separated by whitespace
-			// in the console.
-			if (is_debug && input_data.code != KEY_ENTER) {
-				printf("code=%hu value=%u time=%ld.%06lu\n", input_data.code, input_data.value, input_data.time.tv_sec,
-				       input_data.time.tv_usec);
-			}
-
-			// Filter out non-key input events.
-			if (input_data.type != EV_KEY) {
-				continue;
-			}
-
-			// When any key is released, "reset" these variables.
-			if (input_data.value == 0) {
-				memset(&input_data, 0, input_size);
-				memset(&prev_input_data, 0, input_size);
-				continue;
-			}
-
-			if ((input_data.code == KEY_LEFTSHIFT || input_data.code == KEY_RIGHTSHIFT)) {
-				if (input_data.value == 1) {
-					++sequential_shifts;
+				// Check for "KEY_ENTER" so debug messages can be separated by whitespace
+				// in the console.
+				if (is_debug && input_data.code != KEY_ENTER) {
+					printf("code=%hu value=%u time=%ld.%06lu\n", input_data.code, input_data.value, input_data.time.tv_sec,
+					       input_data.time.tv_usec);
 				}
-			} else {
-				sequential_shifts = 0;
-			}
 
-			bool pressingMetaCombo = prev_input_data.value == 1 &&
-			                         (prev_input_data.code == KEY_LEFTMETA || prev_input_data.code == KEY_RIGHTMETA) &&
-			                         input_data.value == 1 &&
-			                         (input_data.code == KEY_BACKSPACE || input_data.code == KEY_ENTER ||
-			                          input_data.code == KEY_SPACE || input_data.code == KEY_RIGHTALT);
-			if (pressingMetaCombo) {
-				sequential_shifts = 0;
-				pid_t pid = fork();
-				if (pid == -1) {
-					perror("Failed to fork");
-					exit(1);
-				} else if (pid > 0) {
-					int status;
-					if (waitpid(pid, &status, 0) == -1) {
-						perror("Failed waitpid");
-						exit(1);
+				// Filter out non-key input events.
+				if (input_data.type != EV_KEY) {
+					continue;
+				}
+
+				// When any key is released, "reset" these variables.
+				if (input_data.value == 0) {
+					memset(&input_data, 0, input_size);
+					memset(&prev_input_data, 0, input_size);
+					continue;
+				}
+
+				if ((input_data.code == KEY_LEFTSHIFT || input_data.code == KEY_RIGHTSHIFT)) {
+					if (input_data.value == 1) {
+						++sequential_shifts;
 					}
 				} else {
-					if (daemon(false, true) == -1) {
-						perror("Failed to daemonize");
-						exit(1);
-					}
+					sequential_shifts = 0;
+				}
 
-					if (execl(launcher_exe, launcher_exe, (char *)NULL) == -1) {
-						perror("Failed to execl");
+				bool pressingMetaCombo = prev_input_data.value == 1 &&
+				                         (prev_input_data.code == KEY_LEFTMETA || prev_input_data.code == KEY_RIGHTMETA) &&
+				                         input_data.value == 1 &&
+				                         (input_data.code == KEY_BACKSPACE || input_data.code == KEY_ENTER ||
+				                          input_data.code == KEY_SPACE || input_data.code == KEY_RIGHTALT);
+				if (pressingMetaCombo) {
+					sequential_shifts = 0;
+					pid_t pid = fork();
+					if (pid == -1) {
+						perror("Failed to fork");
 						exit(1);
+					} else if (pid > 0) {
+						int status;
+						if (waitpid(pid, &status, 0) == -1) {
+							perror("Failed waitpid");
+							exit(1);
+						}
+					} else {
+						if (daemon(false, true) == -1) {
+							perror("Failed to daemonize");
+							exit(1);
+						}
+
+						if (execl(launcher_exe, launcher_exe, (char *)NULL) == -1) {
+							perror("Failed to execl");
+							exit(1);
+						}
 					}
 				}
-			}
 
-			memcpy(&prev_input_data, &input_data, input_size);
-			memset(&input_data, 0, input_size);
+				memcpy(&prev_input_data, &input_data, input_size);
+				memset(&input_data, 0, input_size);
+			}
 		}
 	}
 
